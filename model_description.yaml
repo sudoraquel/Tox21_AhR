@@ -1,0 +1,105 @@
+#Definition of the entities
+entities:
+- name: atom
+  state_dimension: 60
+  initial_state:
+    - type: build_state
+      input: [$node_labels]
+
+# Definition of the message passing phase
+message_passing:
+  num_iterations: 6
+  stages:
+    # STAGE 1:
+    - stage_message_passings:
+      - destination_entity: atom
+        source_entities:
+          - name: atom
+            message:
+              - type: neural_network
+                nn_name: message_function
+                input: [source, target, edge_labels]
+        aggregation:
+          - type: sum
+        update:
+          type: neural_network
+          nn_name: update_function
+          
+# Definition of the readout
+readout:
+- type: neural_network
+  input : [atom, atom_initial_state]
+  nn_name : q_nn
+  output_name: output_qnn
+- type: neural_network
+  input: [atom]
+  nn_name: p_nn
+  output_name: output_pnn
+- type: product 
+  type_product: element_wise
+  input: [q_nn, p_nn]
+  output_name: readout_node
+- type: pooling
+  type_pooling: sum
+  input: [readout_node]
+  output: readout_output
+- type: neural_network
+  input: [readout_output]
+  nn_name: post-readout_nn
+  output_label: [$classes]
+  
+
+# Definition of the Neural Networks
+neural_networks:
+# Feed forward model
+- nn_name: message_function
+  nn_architecture:
+  - type_layer: Dense
+    units: 120
+    activation: relu
+  - type_layer: Dense
+    units: 120
+    activation: relu
+  - type_layer: Dense
+    units: 120
+    activation: relu
+  - type_layer: Dense
+    units: 60
+
+- nn_name: update_function
+  nn_architecture:
+    - type_layer: GRU
+
+- nn_name: q_nn
+  nn_architecture: 
+  - type_layer: Dense
+    units: 120
+    activation: relu
+  - type_layer: Dense
+    units: 120
+    activation: relu
+  - type_layer: Dense
+    units: 120
+    activation: sigmoid
+
+- nn_name: p_nn
+  nn_architecture: 
+  - type_layer: Dense
+    units: 120
+    activation: relu
+  - type_layer: Dense
+    units: 120
+    activation: relu
+  - type_layer: Dense
+    units: 120
+
+- nn_name: post-readout_nn
+  nn_architecture: 
+  - type_layer: Dense
+    units: 120
+    activation: relu
+  - type_layer: Dense
+    units: 120
+    activation: relu
+  - type_layer: Dense
+    units: 1
