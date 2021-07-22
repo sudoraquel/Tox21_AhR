@@ -18,7 +18,7 @@ message_passing:
             message:
               - type: neural_network
                 nn_name: message_function
-                input: [source, target, edge_labels]
+                input: [source, destination, edge_labels]
         aggregation:
           - type: sum
         update:
@@ -42,7 +42,7 @@ readout:
 - type: pooling
   type_pooling: sum
   input: [readout_node]
-  output: readout_output
+  output_name: readout_output
 - type: neural_network
   input: [readout_output]
   nn_name: post-readout_nn
