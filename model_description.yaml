@@ -8,7 +8,7 @@ entities:
 
 # Definition of the message passing phase
 message_passing:
-  num_iterations: 6
+  num_iterations: 4
   stages:
     # STAGE 1:
     - stage_message_passings:
@@ -18,7 +18,7 @@ message_passing:
             message:
               - type: neural_network
                 nn_name: message_function
-                input: [source, destination, edge_labels]
+                input: [source, destination, $edge_labels]
         aggregation:
           - type: sum
         update:
@@ -36,8 +36,8 @@ readout:
   nn_name: p_nn
   output_name: output_pnn
 - type: product 
+  input: [output_qnn, output_pnn]
   type_product: element_wise
-  input: [q_nn, p_nn]
   output_name: readout_node
 - type: pooling
   type_pooling: sum
@@ -55,13 +55,13 @@ neural_networks:
 - nn_name: message_function
   nn_architecture:
   - type_layer: Dense
-    units: 120
+    units: 90
     activation: relu
   - type_layer: Dense
-    units: 120
+    units: 90
     activation: relu
   - type_layer: Dense
-    units: 120
+    units: 90
     activation: relu
   - type_layer: Dense
     units: 60
@@ -73,33 +73,34 @@ neural_networks:
 - nn_name: q_nn
   nn_architecture: 
   - type_layer: Dense
-    units: 120
+    units: 90
     activation: relu
   - type_layer: Dense
-    units: 120
+    units: 90
     activation: relu
   - type_layer: Dense
-    units: 120
+    units: 90
     activation: sigmoid
 
 - nn_name: p_nn
   nn_architecture: 
   - type_layer: Dense
-    units: 120
+    units: 90
     activation: relu
   - type_layer: Dense
-    units: 120
+    units: 90
     activation: relu
   - type_layer: Dense
-    units: 120
+    units: 90
 
 - nn_name: post-readout_nn
   nn_architecture: 
   - type_layer: Dense
-    units: 120
+    units: 90
     activation: relu
   - type_layer: Dense
-    units: 120
+    units: 90
     activation: relu
   - type_layer: Dense
     units: 1
+    activation: sigmoid
